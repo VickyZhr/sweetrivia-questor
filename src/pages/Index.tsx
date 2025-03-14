@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import NumberInput from '@/components/NumberInput';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/utils/toast';
 
 const Index = () => {
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);

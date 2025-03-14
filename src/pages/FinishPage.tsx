@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/utils/toast';
 import { TriviaQuestion, convertToCSV, downloadCSV, uploadToCloud } from '@/utils/csvUtils';
 
 const FinishPage = () => {

@@ -5,7 +5,7 @@ import Card from '@/components/Card';
 import Button from '@/components/Button';
 import QuestionInput from '@/components/QuestionInput';
 import Header from '@/components/Header';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/utils/toast';
 import { TriviaQuestion } from '@/utils/csvUtils';
 
 const QuestionForm = () => {
