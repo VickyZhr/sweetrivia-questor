@@ -30,7 +30,7 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				'forest-green': '#2D5C34', // Added the forest green from the image
+				'forest-green': '#1A3C20', // Darker forest green
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -60,7 +60,7 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				trivia: {
-					pink: '#FF69B4', // Updated to a brighter pink for the title
+					pink: '#FF41B4', // Brighter pink for the title
 					darkGreen: '#004D40',
 					green: '#3A7B54',
 					yellow: '#FFEB3B',
