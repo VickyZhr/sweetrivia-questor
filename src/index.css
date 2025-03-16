@@ -42,13 +42,13 @@
   }
 
   body {
-    @apply bg-trivia-pink text-foreground antialiased overflow-x-hidden;
+    @apply bg-forest-green text-foreground antialiased overflow-x-hidden;
     background-image: none;
     background-attachment: fixed;
   }
 
   ::selection {
-    @apply bg-trivia-green text-white;
+    @apply bg-trivia-pink text-white;
   }
 }
 
