@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@/components/Card';
@@ -51,10 +52,6 @@ const Index = () => {
       
       <Card className="animate-in fade-in delay-300 w-full">
         <div className="space-y-6">
-          <h2 className="text-white text-xl font-medium">
-            Let's get started
-          </h2>
-          
           <NumberInput
             value={numberOfQuestions}
             onChange={setNumberOfQuestions}
