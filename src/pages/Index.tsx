@@ -41,7 +41,8 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
       <div className="animate-in fade-in w-full max-w-xl mx-auto text-center mb-8">
         <h1 
-          className={`font-display text-6xl md:text-7xl font-bold text-trivia-pink mb-4 tracking-tight title-glow animate-in slide-in-down ${isAnimationComplete ? 'animate-pulse-slow' : ''}`}
+          className={`font-pixel text-7xl md:text-8xl font-bold text-trivia-green mb-4 tracking-wide uppercase ${isAnimationComplete ? 'animate-pulse-slow' : ''}`}
+          style={{ letterSpacing: '0.1em' }}
         >
           SweeTrivia
         </h1>

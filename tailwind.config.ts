@@ -22,6 +22,7 @@ export default {
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
 				display: ['Playfair Display', 'serif'],
+				pixel: ['"Press Start 2P"', 'monospace'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -58,8 +59,9 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				trivia: {
-					pink: '#FF5CAD',
+					pink: '#E35A9E',
 					darkGreen: '#004D40',
+					green: '#3A7B54',
 					yellow: '#FFEB3B',
 					lightGreen: '#00796B',
 					cream: '#FFF8E1',
