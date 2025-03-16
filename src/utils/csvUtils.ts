@@ -1,4 +1,6 @@
 
+import { supabase } from './supabaseClient';
+
 export interface TriviaQuestion {
   question: string;
   optionA: string;
@@ -52,15 +54,61 @@ export const downloadCSV = (csvData: string, filename = 'trivia_questions.csv'):
 };
 
 /**
- * Simulates uploading to a cloud database
- * In a real application, this would make an API call to your backend
+ * Uploads CSV data to Supabase storage
+ * Returns the URL where the file can be accessed
  */
 export const uploadToCloud = async (csvData: string): Promise<boolean> => {
-  // Simulate an API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Uploading to cloud...', csvData.substring(0, 100) + '...');
-      resolve(true);
-    }, 2000);
-  });
+  try {
+    // Generate a unique filename using timestamp
+    const timestamp = new Date().getTime();
+    const filename = `trivia_questions_${timestamp}.csv`;
+    
+    // Convert CSV string to File object
+    const file = new File([csvData], filename, { type: 'text/csv' });
+    
+    // Upload to Supabase storage
+    const { data, error } = await supabase.storage
+      .from('trivia-questions')
+      .upload(filename, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+    
+    if (error) {
+      console.error('Error uploading to Supabase:', error);
+      return false;
+    }
+    
+    // Store metadata in a table for easy access
+    const { error: dbError } = await supabase
+      .from('trivia_files')
+      .insert({
+        filename: filename,
+        created_at: new Date().toISOString(),
+        path: data?.path || '',
+        download_url: getFilePublicUrl(filename),
+        active: true
+      });
+    
+    if (dbError) {
+      console.error('Error storing metadata:', dbError);
+      return false;
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Unexpected error during upload:', err);
+    return false;
+  }
+};
+
+/**
+ * Helper function to get the public URL of a file
+ */
+const getFilePublicUrl = (filename: string): string => {
+  const { data } = supabase.storage
+    .from('trivia-questions')
+    .getPublicUrl(filename);
+  
+  return data.publicUrl;
 };

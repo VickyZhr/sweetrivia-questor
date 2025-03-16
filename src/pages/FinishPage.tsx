@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@/components/Card';
@@ -10,6 +11,7 @@ const FinishPage = () => {
   const [questions, setQuestions] = useState<TriviaQuestion[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadComplete, setIsUploadComplete] = useState(false);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -47,13 +49,13 @@ const FinishPage = () => {
     try {
       const success = await uploadToCloud(csvData);
       if (success) {
-        toast.success("Questions uploaded to cloud successfully");
+        toast.success("Questions uploaded to Supabase successfully");
         setIsUploadComplete(true);
       } else {
-        toast.error("Failed to upload questions to cloud");
+        toast.error("Failed to upload questions to Supabase");
       }
     } catch (error) {
-      console.error("Error uploading to cloud:", error);
+      console.error("Error uploading to Supabase:", error);
       toast.error("An error occurred while uploading");
     } finally {
       setIsUploading(false);
@@ -120,7 +122,7 @@ const FinishPage = () => {
                 isLoading={isUploading}
                 disabled={isUploading || isUploadComplete}
               >
-                {isUploadComplete ? 'Uploaded Successfully' : 'Upload to Cloud'}
+                {isUploadComplete ? 'Uploaded Successfully' : 'Upload to Supabase'}
               </Button>
               
               <Button 
@@ -139,6 +141,7 @@ const FinishPage = () => {
       <div className="p-6 text-center animate-in fade-in">
         <p className="text-white/60 text-sm">
           Your trivia questions are saved locally until you clear your browser data.
+          {isUploadComplete && " They are also available in the cloud for your Raspberry Pi."}
         </p>
       </div>
     </div>
