@@ -63,7 +63,7 @@ export default {
 					pink: '#FF41B4', // Brighter pink for the title
 					darkGreen: '#004D40',
 					green: '#3A7B54',
-					yellow: '#FFEB3B',
+					yellow: '#FFEB3B', // Bright yellow color for subtitle
 					lightGreen: '#00796B',
 					cream: '#FFF8E1',
 					darkText: '#212121',
