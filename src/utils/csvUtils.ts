@@ -68,7 +68,7 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
     
     console.log('Starting upload to Supabase storage...');
     
-    // First check if the bucket exists
+    // Check if bucket exists, create it if it doesn't
     const { data: buckets, error: bucketError } = await supabase.storage
       .listBuckets();
       
@@ -77,15 +77,41 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
       return false;
     }
     
-    const bucketExists = buckets.some(bucket => bucket.name === 'trivia-questions');
+    const bucketName = 'trivia-questions';
+    const bucketExists = buckets.some(bucket => bucket.name === bucketName);
+    
     if (!bucketExists) {
-      console.error('Bucket "trivia-questions" does not exist');
-      return false;
+      console.log(`Bucket "${bucketName}" does not exist, attempting to create it...`);
+      
+      // Try to create the bucket
+      const { data: newBucket, error: createError } = await supabase.storage
+        .createBucket(bucketName, {
+          public: true, // Make the bucket publicly accessible
+          fileSizeLimit: 1024 * 1024 * 5, // 5MB limit per file
+        });
+      
+      if (createError) {
+        console.error('Error creating bucket:', createError);
+        return false;
+      }
+      
+      console.log('Successfully created bucket:', newBucket);
+    }
+    
+    // Set bucket to public if it exists but isn't public
+    const { error: updateError } = await supabase.storage
+      .updateBucket(bucketName, {
+        public: true, // Ensure the bucket is public
+      });
+    
+    if (updateError) {
+      console.error('Error updating bucket visibility:', updateError);
+      // Continue anyway, the upload might still work
     }
     
     // Upload to Supabase storage
     const { data, error } = await supabase.storage
-      .from('trivia-questions')
+      .from(bucketName)
       .upload(filename, file, {
         cacheControl: '3600',
         upsert: false
@@ -93,6 +119,12 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
     
     if (error) {
       console.error('Error uploading to Supabase storage:', error);
+      
+      // Check for specific errors
+      if (error.message?.includes('new row violates row-level security')) {
+        console.error('RLS policy is preventing the upload. You need to configure RLS in your Supabase dashboard.');
+      }
+      
       return false;
     }
     
@@ -110,7 +142,7 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
     }
     
     // Store metadata in a table for easy access
-    const fileUrl = getFilePublicUrl(filename);
+    const fileUrl = getFilePublicUrl(filename, bucketName);
     const { error: dbError } = await supabase
       .from('trivia_files')
       .insert({
@@ -138,9 +170,9 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
 /**
  * Helper function to get the public URL of a file
  */
-const getFilePublicUrl = (filename: string): string => {
+const getFilePublicUrl = (filename: string, bucketName = 'trivia-questions'): string => {
   const { data } = supabase.storage
-    .from('trivia-questions')
+    .from(bucketName)
     .getPublicUrl(filename);
   
   return data.publicUrl;
