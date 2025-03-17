@@ -66,6 +66,23 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
     // Convert CSV string to File object
     const file = new File([csvData], filename, { type: 'text/csv' });
     
+    console.log('Starting upload to Supabase storage...');
+    
+    // First check if the bucket exists
+    const { data: buckets, error: bucketError } = await supabase.storage
+      .listBuckets();
+      
+    if (bucketError) {
+      console.error('Error checking buckets:', bucketError);
+      return false;
+    }
+    
+    const bucketExists = buckets.some(bucket => bucket.name === 'trivia-questions');
+    if (!bucketExists) {
+      console.error('Bucket "trivia-questions" does not exist');
+      return false;
+    }
+    
     // Upload to Supabase storage
     const { data, error } = await supabase.storage
       .from('trivia-questions')
@@ -75,26 +92,42 @@ export const uploadToCloud = async (csvData: string): Promise<boolean> => {
       });
     
     if (error) {
-      console.error('Error uploading to Supabase:', error);
+      console.error('Error uploading to Supabase storage:', error);
       return false;
     }
     
+    console.log('Successfully uploaded file to Supabase storage:', data);
+    
+    // Check if trivia_files table exists before inserting
+    const { error: tableCheckError } = await supabase
+      .from('trivia_files')
+      .select('count(*)', { count: 'exact', head: true });
+      
+    if (tableCheckError) {
+      console.error('Error checking trivia_files table:', tableCheckError);
+      console.log('File uploaded to storage but metadata was not saved');
+      return true; // File was uploaded even if we can't save metadata
+    }
+    
     // Store metadata in a table for easy access
+    const fileUrl = getFilePublicUrl(filename);
     const { error: dbError } = await supabase
       .from('trivia_files')
       .insert({
         filename: filename,
         created_at: new Date().toISOString(),
         path: data?.path || '',
-        download_url: getFilePublicUrl(filename),
+        download_url: fileUrl,
         active: true
       });
     
     if (dbError) {
       console.error('Error storing metadata:', dbError);
-      return false;
+      console.log('File uploaded to storage but metadata was not saved');
+      return true; // File was uploaded even if we can't save metadata
     }
     
+    console.log('Successfully stored file metadata, public URL:', fileUrl);
     return true;
   } catch (err) {
     console.error('Unexpected error during upload:', err);
